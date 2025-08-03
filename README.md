@@ -1,6 +1,6 @@
 # 🖼️ Image Annotation Tool
 
-A Tkinter-based desktop application for annotating images with bounding boxes and polygons. Perfect for preparing datasets for computer vision tasks! ✏️
+A Tkinter-based desktop application for annotating images with bounding boxes and polygons. Perfect for preparing datasets for computer vision tasks.
 
 ## ⚙️ Features
 
