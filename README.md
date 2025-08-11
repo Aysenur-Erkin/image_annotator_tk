@@ -2,17 +2,20 @@
 
 A Tkinter-based desktop application for annotating images with bounding boxes and polygons. Perfect for preparing datasets for computer vision tasks.
 
+![panel](image.png)
+
+
 ## ⚙️ Features
 
-* **Box & Polygon Annotation** 🖌️: Draw axis-aligned bounding boxes or freeform polygons on images.
-* **Labeling** 🏷️: Assign labels to each annotation via dropdown; editable and customizable.
-* **Undo/Redo** 🔄: Mistakes? Easily undo (Ctrl+Z) or redo (Ctrl+Y) actions.
-* **Zoom & Pan** 🔎: Mouse wheel to zoom; middle-click drag to pan the image.
-* **Multi-image Navigation** 📂: Open a folder or single image, then use `< Prev` / `Next >` to cycle through.
-* **Save & Load** 💾: Export annotations to JSON or CSV; reload existing annotation files.
-* **Color-coded Labels** 🎨: Each label gets a unique color for easy visualization.
-* **Dark Mode** 🌙 / ☀️: Toggle between light and dark UI themes via `View → Dark Mode`.
-* **Menu & Toolbar** 🛠️: Intuitive menu bar with icons and keyboard shortcuts.
+* **Box & Polygon Annotation**: Draw axis-aligned bounding boxes or freeform polygons on images.
+* **Labeling** : Assign labels to each annotation via dropdown; editable and customizable.
+* **Undo/Redo**: Mistakes? Easily undo (Ctrl+Z) or redo (Ctrl+Y) actions.
+* **Zoom & Pan**: Mouse wheel to zoom; middle-click drag to pan the image.
+* **Multi-image Navigation**: Open a folder or single image, then use `< Prev` / `Next >` to cycle through.
+* **Save & Load**: Export annotations to JSON or CSV; reload existing annotation files.
+* **Color-coded Labels**: Each label gets a unique color for easy visualization.
+* **Dark Mode**: Toggle between light and dark UI themes via `View → Dark Mode`.
+* **Menu & Toolbar**: Intuitive menu bar with icons and keyboard shortcuts.
 
 ## 🛠️ Installation
 
@@ -73,7 +76,6 @@ A Tkinter-based desktop application for annotating images with bounding boxes an
 * **Add new labels** directly in the dropdown.
 * **Icon & Theme**: Swap out PNGs in `resources/` or tweak colors in `main_window.py`.
 
-## 🤝 Contributing
+## License
 
-Welcome contributions! Feel free to open issues or pull requests for bugs, feature requests, or improvements.
-
+This project is released under the MIT License. See [LICENSE](LICENSE) for details.
