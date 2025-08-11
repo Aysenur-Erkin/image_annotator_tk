@@ -2,8 +2,7 @@
 
 A Tkinter-based desktop application for annotating images with bounding boxes and polygons. Perfect for preparing datasets for computer vision tasks.
 
-![panel](image.png)
-
+<img src="image.png" alt="panel" width="400">
 
 ## ⚙️ Features
 
