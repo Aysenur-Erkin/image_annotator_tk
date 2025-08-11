@@ -19,7 +19,7 @@ A Tkinter-based desktop application for annotating images with bounding boxes an
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/image_annotation_tool.git
+   git clone https://github.com/Aysenur-Erkin/image_annotator_tk.git
    cd image_annotation_tool
    ```
 
