@@ -4,16 +4,16 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from PIL import Image, ImageTk
 
-from ui.controls_frame      import ControlsFrame
-from ui.canvas_widget       import CanvasWidget
-from io_utils.file_manager  import FileManager
+from ui.controls_frame import ControlsFrame
+from ui.canvas_widget import CanvasWidget
+from io_utils.file_manager import FileManager
 from io_utils.annotation_io import (
     save_to_json, load_from_json,
-    save_to_csv,  load_from_csv
+    save_to_csv, load_from_csv,
 )
 from annotator.tool_manager import ToolManager
-from annotator.box_tool     import BoxTool
-from annotator.poly_tool    import PolyTool
+from annotator.box_tool import BoxTool
+from annotator.poly_tool import PolyTool
 
 class MainWindow(tk.Frame):
     def __init__(self, master):
@@ -23,24 +23,24 @@ class MainWindow(tk.Frame):
 
         self.light_bg = "#f0f0f0"
         self.light_fg = "#000000"
-        self.dark_bg  = "#2e2e2e"
-        self.dark_fg  = "#ffffff"
-        self.dark_mode     = False
+        self.dark_bg = "#2e2e2e"
+        self.dark_fg = "#ffffff"
+        self.dark_mode = False
         self.dark_mode_var = tk.BooleanVar(value=False)
 
         def load_icon(name):
             path = os.path.join("resources", f"{name}.png")
-            img  = Image.open(path).resize((16,16), Image.LANCZOS)
+            img = Image.open(path).resize((16, 16), Image.LANCZOS)
             return ImageTk.PhotoImage(img)
 
-        self.icon_open     = load_icon("open")
-        self.icon_save     = load_icon("save")
-        self.icon_load     = load_icon("load")
-        self.icon_exit     = load_icon("exit")
-        self.icon_undo     = load_icon("undo")
-        self.icon_redo     = load_icon("redo")
-        self.icon_box      = load_icon("box")
-        self.icon_poly     = load_icon("poly")
+        self.icon_open = load_icon("open")
+        self.icon_save = load_icon("save")
+        self.icon_load = load_icon("load")
+        self.icon_exit = load_icon("exit")
+        self.icon_undo = load_icon("undo")
+        self.icon_redo = load_icon("redo")
+        self.icon_box = load_icon("box")
+        self.icon_poly = load_icon("poly")
         self.icon_darkmode = load_icon("dark_mode")
 
         menubar = tk.Menu(master)
@@ -113,28 +113,28 @@ class MainWindow(tk.Frame):
         master.bind_all("<Control-b>", lambda e: self._on_tool_change("box"))
         master.bind_all("<Control-p>", lambda e: self._on_tool_change("poly"))
 
-        self.labels       = ["default"]
+        self.labels = ["default"]
         self.label_colors = {"default": "red"}
         self.current_label = "default"
 
         self.annotations = []
-        self.undo_stack  = []
-        self.redo_stack  = []
+        self.undo_stack = []
+        self.redo_stack = []
 
         self.file_manager = FileManager()
 
         self.controls = ControlsFrame(
             self,
-            on_tool_change  = self._on_tool_change,
-            on_open         = self._on_open,
-            on_prev         = self._on_prev,
-            on_next         = self._on_next,
-            on_undo         = self._on_undo,
-            on_redo         = self._on_redo,
-            on_save         = self._on_save_annotations,
-            on_load         = self._on_load_annotations,
-            labels          = self.labels,
-            on_label_change = self._on_label_change
+            on_tool_change=self._on_tool_change,
+            on_open=self._on_open,
+            on_prev=self._on_prev,
+            on_next=self._on_next,
+            on_undo=self._on_undo,
+            on_redo=self._on_redo,
+            on_save=self._on_save_annotations,
+            on_load=self._on_load_annotations,
+            labels=self.labels,
+            on_label_change=self._on_label_change,
         )
         self.controls.pack(fill=tk.X)
 
@@ -147,27 +147,25 @@ class MainWindow(tk.Frame):
             BoxTool(
                 self.canvas,
                 on_complete=self._on_new_annotation,
-                get_color=self._get_current_color
-            )
+                get_color=self._get_current_color,
+            ),
         )
         self.tool_manager.register_tool(
             "poly",
             PolyTool(
                 self.canvas,
                 on_complete=self._on_new_annotation,
-                get_color=self._get_current_color
-            )
+                get_color=self._get_current_color,
+            ),
         )
         self.tool_manager.set_tool("box")
         self.canvas.on_view_change = self._on_view_change
 
         self._apply_theme()
 
-
     def _toggle_dark_mode(self):
         self.dark_mode = self.dark_mode_var.get()
         self._apply_theme()
-
 
     def _apply_theme(self):
         bg = self.dark_bg if self.dark_mode else self.light_bg
@@ -175,33 +173,28 @@ class MainWindow(tk.Frame):
 
         self.configure(bg=bg)
         self.master.configure(bg=bg)
-
         self.controls.configure(bg=bg)
         for child in self.controls.winfo_children():
             try:
                 child.configure(bg=bg, fg=fg)
-            except:
+            except tk.TclError:
                 pass
 
         self.canvas.configure(bg=bg)
-
         style = ttk.Style()
         style.theme_use("clam")
         style.configure(
             "TCombobox",
             fieldbackground=bg,
             background=bg,
-            foreground=fg
+            foreground=fg,
         )
-
 
     def _get_current_color(self):
         return self.label_colors.get(self.current_label, "red")
 
-
     def _generate_color(self):
         return "#%06x" % random.randint(0, 0xFFFFFF)
-
 
     def _color_for(self, label):
         if label not in self.labels:
@@ -210,25 +203,21 @@ class MainWindow(tk.Frame):
             self.controls.combo["values"] = self.labels
         return self.label_colors[label]
 
-
     def _on_label_change(self, label):
         self._color_for(label)
         self.current_label = label
 
-
     def _on_tool_change(self, tool_name):
         self.tool_manager.set_tool(tool_name)
-
 
     def _on_open(self):
         path = filedialog.askopenfilename(
             title="Bir resim seç",
-            filetypes=[("Image files", "*.jpg *.jpeg *.png *.bmp *.gif")]
+            filetypes=[("Image files", "*.jpg *.jpeg *.png *.bmp *.gif")],
         )
         if not path:
             return
         self._open_path(path)
-
 
     def _open_path(self, path):
         path = os.path.normpath(path)
@@ -240,29 +229,23 @@ class MainWindow(tk.Frame):
             pass
         self._show(path)
 
-
     def _show(self, path):
-        # loading redraws through _on_view_change
         self.tool_manager.cancel()
         self.canvas.load_image(path)
-
 
     def _on_view_change(self):
         self._redraw_annotations()
         self.tool_manager.redraw()
-
 
     def _on_prev(self):
         path = self.file_manager.prev()
         if path:
             self._show(path)
 
-
     def _on_next(self):
         path = self.file_manager.next()
         if path:
             self._show(path)
-
 
     def _on_new_annotation(self, ann):
         ann.label = self.current_label
@@ -271,46 +254,40 @@ class MainWindow(tk.Frame):
         self.redo_stack.clear()
         self._draw_annotation(ann)
 
-
     def _draw_annotation(self, ann):
         color = self._color_for(ann.label)
         to_canvas = self.canvas.to_canvas
-        # Draw shape
         if hasattr(ann, "points"):
             pts = [to_canvas(x, y) for x, y in ann.points]
             for i in range(len(pts)):
                 x0, y0 = pts[i]
-                x1, y1 = pts[(i+1) % len(pts)]
+                x1, y1 = pts[(i + 1) % len(pts)]
                 self.canvas.create_line(
                     x0, y0, x1, y1,
                     fill=color, width=2,
-                    tags=("annotation", ann.id)
+                    tags=("annotation", ann.id),
                 )
+            xs, ys = zip(*pts)
+            cx, cy = sum(xs) / len(xs), sum(ys) / len(ys)
+            self.canvas.create_text(
+                cx, cy, text=ann.label,
+                fill=color, tags=("annotation", ann.id),
+                font=("Arial", 12, "bold"),
+            )
         else:
             x1, y1 = to_canvas(ann.x1, ann.y1)
             x2, y2 = to_canvas(ann.x2, ann.y2)
             self.canvas.create_rectangle(
                 x1, y1, x2, y2,
                 outline=color, width=2,
-                tags=("annotation", ann.id)
+                tags=("annotation", ann.id),
             )
-        # Draw label
-        if hasattr(ann, "points"):
-            xs, ys = zip(*pts)
-            cx, cy = sum(xs)/len(xs), sum(ys)/len(ys)
-            self.canvas.create_text(
-                cx, cy, text=ann.label,
-                fill=color, tags=("annotation", ann.id),
-                font=("Arial", 12, "bold")
-            )
-        else:
             x, y = to_canvas(ann.x1, ann.y1)
             self.canvas.create_text(
-                x, y-5, text=ann.label,
+                x, y - 5, text=ann.label,
                 fill=color, tags=("annotation", ann.id),
-                anchor="sw", font=("Arial", 10, "bold")
+                anchor="sw", font=("Arial", 10, "bold"),
             )
-
 
     def _on_undo(self):
         if not self.undo_stack:
@@ -321,7 +298,6 @@ class MainWindow(tk.Frame):
         self.redo_stack.append(ann)
         self.canvas.delete(ann.id)
 
-
     def _on_redo(self):
         if not self.redo_stack:
             return
@@ -330,15 +306,13 @@ class MainWindow(tk.Frame):
         self.undo_stack.append(ann)
         self._draw_annotation(ann)
 
-
     def _on_save_annotations(self):
         if not self.annotations:
             messagebox.showinfo("Save", "No annotations to save.")
             return
         path = filedialog.asksaveasfilename(
             defaultextension=".json",
-            filetypes=[("JSON files", "*.json"),
-                       ("CSV files", "*.csv")]
+            filetypes=[("JSON files", "*.json"), ("CSV files", "*.csv")],
         )
         if not path:
             return
@@ -348,11 +322,9 @@ class MainWindow(tk.Frame):
             save_to_json(self.annotations, path)
         messagebox.showinfo("Save", f"Annotations saved:\n{path}")
 
-
     def _on_load_annotations(self):
         path = filedialog.askopenfilename(
-            filetypes=[("JSON files", "*.json"),
-                       ("CSV files", "*.csv")]
+            filetypes=[("JSON files", "*.json"), ("CSV files", "*.csv")],
         )
         if not path:
             return
@@ -372,7 +344,6 @@ class MainWindow(tk.Frame):
         else:
             self._redraw_annotations()
         messagebox.showinfo("Load", f"{len(anns)} annotations loaded.")
-
 
     def _redraw_annotations(self):
         current = self.file_manager.current()
