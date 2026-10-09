@@ -82,12 +82,12 @@ class MainWindow(tk.Frame):
 
         tools_menu = tk.Menu(menubar, tearoff=0)
         tools_menu.add_command(
-            label="Box", accelerator="B",
+            label="Box", accelerator="Ctrl+B",
             command=lambda: self._on_tool_change("box"),
             image=self.icon_box, compound="left"
         )
         tools_menu.add_command(
-            label="Poly", accelerator="P",
+            label="Poly", accelerator="Ctrl+P",
             command=lambda: self._on_tool_change("poly"),
             image=self.icon_poly, compound="left"
         )
