@@ -27,7 +27,7 @@ class BoxTool:
             self.start_x, self.start_y,
             self.start_x, self.start_y,
             outline=color, width=2,
-            tags="annotation"
+            tags="preview"
         )
 
     def on_mouse_move(self, event):
@@ -43,8 +43,10 @@ class BoxTool:
         if not self.rect_id:
             return
         x1, y1, x2, y2 = map(int, self.canvas.coords(self.rect_id))
+        self.canvas.delete(self.rect_id)
         img_path = getattr(self.canvas, "image_path", None)
-        if img_path:
+        too_small = abs(x2 - x1) < 2 or abs(y2 - y1) < 2
+        if img_path and not too_small:
             ann = BoxAnnotation.create(
                 image_path=img_path,
                 x1=x1, y1=y1, x2=x2, y2=y2
