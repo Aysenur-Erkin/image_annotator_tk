@@ -159,6 +159,7 @@ class MainWindow(tk.Frame):
             )
         )
         self.tool_manager.set_tool("box")
+        self.canvas.on_view_change = self._on_view_change
 
         self._apply_theme()
 
@@ -230,28 +231,36 @@ class MainWindow(tk.Frame):
 
 
     def _open_path(self, path):
-        self.canvas.load_image(path)
         folder = os.path.dirname(path)
         self.file_manager.load_folder(folder)
         try:
             self.file_manager.idx = self.file_manager.files.index(path)
         except ValueError:
             pass
+        self._show(path)
+
+
+    def _show(self, path):
+        # loading redraws through _on_view_change
+        self.tool_manager.cancel()
+        self.canvas.load_image(path)
+
+
+    def _on_view_change(self):
         self._redraw_annotations()
+        self.tool_manager.redraw()
 
 
     def _on_prev(self):
         path = self.file_manager.prev()
         if path:
-            self.canvas.load_image(path)
-            self._redraw_annotations()
+            self._show(path)
 
 
     def _on_next(self):
         path = self.file_manager.next()
         if path:
-            self.canvas.load_image(path)
-            self._redraw_annotations()
+            self._show(path)
 
 
     def _on_new_annotation(self, ann):
@@ -264,9 +273,10 @@ class MainWindow(tk.Frame):
 
     def _draw_annotation(self, ann):
         color = self._color_for(ann.label)
+        to_canvas = self.canvas.to_canvas
         # Draw shape
         if hasattr(ann, "points"):
-            pts = ann.points
+            pts = [to_canvas(x, y) for x, y in ann.points]
             for i in range(len(pts)):
                 x0, y0 = pts[i]
                 x1, y1 = pts[(i+1) % len(pts)]
@@ -276,14 +286,16 @@ class MainWindow(tk.Frame):
                     tags=("annotation", ann.id)
                 )
         else:
+            x1, y1 = to_canvas(ann.x1, ann.y1)
+            x2, y2 = to_canvas(ann.x2, ann.y2)
             self.canvas.create_rectangle(
-                ann.x1, ann.y1, ann.x2, ann.y2,
+                x1, y1, x2, y2,
                 outline=color, width=2,
                 tags=("annotation", ann.id)
             )
         # Draw label
         if hasattr(ann, "points"):
-            xs, ys = zip(*ann.points)
+            xs, ys = zip(*pts)
             cx, cy = sum(xs)/len(xs), sum(ys)/len(ys)
             self.canvas.create_text(
                 cx, cy, text=ann.label,
@@ -291,7 +303,7 @@ class MainWindow(tk.Frame):
                 font=("Arial", 12, "bold")
             )
         else:
-            x, y = ann.x1, ann.y1
+            x, y = to_canvas(ann.x1, ann.y1)
             self.canvas.create_text(
                 x, y-5, text=ann.label,
                 fill=color, tags=("annotation", ann.id),

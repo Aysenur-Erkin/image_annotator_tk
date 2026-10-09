@@ -14,3 +14,11 @@ class ToolManager:
         if tool:
             self.active_tool = tool
             self.active_tool.activate()
+
+    def cancel(self):
+        if self.active_tool:
+            self.active_tool.cancel(None)
+
+    def redraw(self):
+        if self.active_tool and hasattr(self.active_tool, "redraw"):
+            self.active_tool.redraw()
