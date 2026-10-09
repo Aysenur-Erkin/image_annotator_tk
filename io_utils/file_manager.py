@@ -7,8 +7,10 @@ class FileManager:
 
     def load_folder(self, folder_path):
         exts = ('.jpg', '.jpeg', '.png', '.bmp', '.gif')
+        # normpath: the Windows file dialog returns "C:/a/b.png" but
+        # os.path.join adds "\\", so the same file would not compare equal
         self.files = sorted([
-            os.path.join(folder_path, f)
+            os.path.normpath(os.path.join(folder_path, f))
             for f in os.listdir(folder_path)
             if f.lower().endswith(exts)
         ])

@@ -231,6 +231,7 @@ class MainWindow(tk.Frame):
 
 
     def _open_path(self, path):
+        path = os.path.normpath(path)
         folder = os.path.dirname(path)
         self.file_manager.load_folder(folder)
         try:
@@ -377,6 +378,6 @@ class MainWindow(tk.Frame):
         current = self.file_manager.current()
         self.canvas.delete("annotation")
         for ann in self.annotations:
-            if ann.image_path != current:
+            if os.path.normpath(ann.image_path) != current:
                 continue
             self._draw_annotation(ann)
