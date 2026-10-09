@@ -202,11 +202,16 @@ class MainWindow(tk.Frame):
         return "#%06x" % random.randint(0, 0xFFFFFF)
 
 
-    def _on_label_change(self, label):
+    def _color_for(self, label):
         if label not in self.labels:
             self.labels.append(label)
             self.label_colors[label] = self._generate_color()
             self.controls.combo["values"] = self.labels
+        return self.label_colors[label]
+
+
+    def _on_label_change(self, label):
+        self._color_for(label)
         self.current_label = label
 
 
@@ -221,6 +226,10 @@ class MainWindow(tk.Frame):
         )
         if not path:
             return
+        self._open_path(path)
+
+
+    def _open_path(self, path):
         self.canvas.load_image(path)
         folder = os.path.dirname(path)
         self.file_manager.load_folder(folder)
@@ -247,7 +256,6 @@ class MainWindow(tk.Frame):
 
     def _on_new_annotation(self, ann):
         ann.label = self.current_label
-        ann.color = self._get_current_color()
         self.annotations.append(ann)
         self.undo_stack.append(ann)
         self.redo_stack.clear()
@@ -255,6 +263,7 @@ class MainWindow(tk.Frame):
 
 
     def _draw_annotation(self, ann):
+        color = self._color_for(ann.label)
         # Draw shape
         if hasattr(ann, "points"):
             pts = ann.points
@@ -263,13 +272,13 @@ class MainWindow(tk.Frame):
                 x1, y1 = pts[(i+1) % len(pts)]
                 self.canvas.create_line(
                     x0, y0, x1, y1,
-                    fill=ann.color, width=2,
+                    fill=color, width=2,
                     tags=("annotation", ann.id)
                 )
         else:
             self.canvas.create_rectangle(
                 ann.x1, ann.y1, ann.x2, ann.y2,
-                outline=ann.color, width=2,
+                outline=color, width=2,
                 tags=("annotation", ann.id)
             )
         # Draw label
@@ -278,14 +287,14 @@ class MainWindow(tk.Frame):
             cx, cy = sum(xs)/len(xs), sum(ys)/len(ys)
             self.canvas.create_text(
                 cx, cy, text=ann.label,
-                fill=ann.color, tags=("annotation", ann.id),
+                fill=color, tags=("annotation", ann.id),
                 font=("Arial", 12, "bold")
             )
         else:
             x, y = ann.x1, ann.y1
             self.canvas.create_text(
                 x, y-5, text=ann.label,
-                fill=ann.color, tags=("annotation", ann.id),
+                fill=color, tags=("annotation", ann.id),
                 anchor="sw", font=("Arial", 10, "bold")
             )
 
@@ -339,13 +348,17 @@ class MainWindow(tk.Frame):
         else:
             anns = load_from_json(path)
         self.annotations = anns
-        img = self.file_manager.current()
-        if not img and anns:
+        self.undo_stack.clear()
+        self.redo_stack.clear()
+        if not self.file_manager.current() and anns:
             img = anns[0].image_path
-        if img:
-            self.canvas.load_image(img)
-        self._redraw_annotations()
-        messagebox.showinfo("Load", f"{len(anns)} Annotation loaded.")
+            if not os.path.exists(img):
+                messagebox.showwarning("Load", f"Image not found:\n{img}")
+                return
+            self._open_path(img)
+        else:
+            self._redraw_annotations()
+        messagebox.showinfo("Load", f"{len(anns)} annotations loaded.")
 
 
     def _redraw_annotations(self):
