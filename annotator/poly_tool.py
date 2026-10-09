@@ -22,6 +22,8 @@ class PolyTool:
         self.canvas.unbind("<Escape>")
 
     def add_point(self, event):
+        # Enter/Esc only reach the canvas when it has keyboard focus
+        self.canvas.focus_set()
         x, y = event.x, event.y
         color = self.get_color()
         self.points.append((x, y))
