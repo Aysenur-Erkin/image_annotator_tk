@@ -75,7 +75,6 @@ class PolyTool:
                 image_path=img_path,
                 points=self.points
             )
-            ann.color = color
             self.on_complete(ann)
         self.points = []
         self.line_ids = []

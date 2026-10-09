@@ -44,12 +44,10 @@ class BoxTool:
             return
         x1, y1, x2, y2 = map(int, self.canvas.coords(self.rect_id))
         img_path = getattr(self.canvas, "image_path", None)
-        color = self.get_color()
         if img_path:
             ann = BoxAnnotation.create(
                 image_path=img_path,
                 x1=x1, y1=y1, x2=x2, y2=y2
             )
-            ann.color = color
             self.on_complete(ann)
         self.start_x = self.start_y = self.rect_id = None
